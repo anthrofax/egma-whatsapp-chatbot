@@ -1,37 +1,15 @@
 import json
 import requests
 import pandas as pd
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from nltk.stem import WordNetLemmatizer
-from sklearn.feature_extraction.text import CountVectorizer
-
-
-# Pra-pemrosesan data
-def preprocess_text(text):
-    tokens = word_tokenize(text.lower())
-    stop_words = set(stopwords.words("indonesian"))
-    filtered_tokens = [
-        word for word in tokens if word.isalnum() and word not in stop_words
-    ]
-    factory = StemmerFactory()
-    stemmer = factory.create_stemmer()
-    stemmed_tokens = [stemmer.stem(word) for word in filtered_tokens]
-    return " ".join(stemmed_tokens)
-
 
 # Load dataset
 df = pd.read_csv("training_info.csv")
 
 # Preprocess dataset
 tfidf_vectorizer = TfidfVectorizer()
-# stemmer = StemmerFactory().create_stemmer()
-# lemmatizer = WordNetLemmatizer()
-# vectorizer = CountVectorizer()
-
 x = tfidf_vectorizer.fit_transform(df["Pertanyaan"])
 y = df["Jawaban"]
 
@@ -60,16 +38,6 @@ class ultraChatBot:
         return answer
 
     def predict_answer(self, user_input):
-        # # Pre-process tahap awal
-        # preprocessed_message = preprocess_text(user_input)
-
-        # # Stemming & Lemmatize
-        # processed_tokens = [
-        #     lemmatizer.lemmatize(stemmer.stem(word)) for word in preprocessed_message
-        # ]
-
-        # preprocessed_text = " ".join(processed_tokens)
-
         user_input_tfidf = tfidf_vectorizer.transform([user_input])
 
         answer = classifier.predict(user_input_tfidf)[0]
